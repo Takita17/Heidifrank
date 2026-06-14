@@ -10,10 +10,12 @@ import base64
 import requests
 from mcp.server.fastmcp import FastMCP
 
-WP_URL      = os.environ.get("WP_URL", "https://heidifrank.de")
-WP_USER     = os.environ.get("WP_USER", "")
-WP_PASSWORD = os.environ.get("WP_PASSWORD", "")
-PEXELS_KEY  = os.environ.get("PEXELS_API_KEY", "")
+WP_URL           = os.environ.get("WP_URL", "https://heidifrank.de")
+WP_USER          = os.environ.get("WP_USER", "")
+WP_PASSWORD      = os.environ.get("WP_PASSWORD", "")
+PEXELS_KEY       = os.environ.get("PEXELS_API_KEY", "")
+OPENAI_KEY       = os.environ.get("OPENAI_API_KEY", "")
+HIGGSFIELD_KEY   = os.environ.get("HIGGSFIELD_API_KEY", "")
 
 mcp = FastMCP("heidifrank-wordpress")
 
@@ -44,6 +46,61 @@ def pexels_bild_url(suchbegriff: str) -> str:
     except Exception:
         pass
     return ""
+
+def dalle_bild_url(prompt: str) -> str:
+    """Generiert ein KI-Bild via DALL-E 3 (OpenAI). Prompt auf Englisch für beste Qualität."""
+    if not OPENAI_KEY:
+        return ""
+    try:
+        r = requests.post(
+            "https://api.openai.com/v1/images/generations",
+            headers={"Authorization": f"Bearer {OPENAI_KEY}", "Content-Type": "application/json"},
+            json={
+                "model": "dall-e-3",
+                "prompt": f"Professional health and wellness photography. {prompt}. Clean, warm, optimistic, natural light. No text, no logos. Magazine quality.",
+                "size": "1792x1024",
+                "quality": "standard",
+                "n": 1
+            },
+            timeout=60
+        )
+        if r.status_code == 200:
+            return r.json()["data"][0]["url"]
+    except Exception:
+        pass
+    return ""
+
+def higgsfield_bild_url(prompt: str) -> str:
+    """Generiert ein KI-Bild via Higgsfield AI."""
+    if not HIGGSFIELD_KEY:
+        return ""
+    try:
+        r = requests.post(
+            "https://api.higgsfield.ai/v1/image/generate",
+            headers={"Authorization": f"Bearer {HIGGSFIELD_KEY}", "Content-Type": "application/json"},
+            json={"prompt": prompt, "aspect_ratio": "16:9"},
+            timeout=90
+        )
+        if r.status_code == 200:
+            data = r.json()
+            return data.get("url") or data.get("image_url", "")
+    except Exception:
+        pass
+    return ""
+
+def bild_holen(suchbegriff: str, quelle: str = "pexels") -> str:
+    """Holt Bild von der gewählten Quelle. Fällt auf nächste verfügbare zurück."""
+    quelle = quelle.lower().strip()
+    if quelle == "dalle" or quelle == "dall-e":
+        url = dalle_bild_url(suchbegriff)
+        if url:
+            return url
+    if quelle == "higgsfield":
+        url = higgsfield_bild_url(suchbegriff)
+        if url:
+            return url
+    # Standard: Pexels
+    return pexels_bild_url(suchbegriff)
 
 def bild_nach_wordpress_hochladen(bild_url: str, dateiname: str) -> int:
     """Lädt ein Bild von URL in die WordPress-Mediathek hoch. Gibt Media-ID zurück."""
@@ -209,7 +266,8 @@ def blogbeitrag_erstellen(
     titel: str,
     einleitung: str,
     abschnitte_json: str,
-    pexels_suchbegriff: str = "",
+    bild_suchbegriff: str = "",
+    bild_quelle: str = "pexels",
     tipp_box: str = "",
     tabelle_json: str = "",
     checkliste_json: str = "",
@@ -220,14 +278,15 @@ def blogbeitrag_erstellen(
     """
     Erstellt einen professionellen Blogbeitrag für heidifrank.de.
 
-    abschnitte_json: JSON-Array z.B. [{"titel":"Abschnitt 1","text":"..."},{"titel":"...","text":"..."}]
-    pexels_suchbegriff: Englischer Suchbegriff für Pexels-Bild (z.B. "meditation stress relief")
-    tipp_box: Kurzer fettgedruckter Tipp (optional)
-    tabelle_json: JSON z.B. {"kopfzeile":["Was","Wie"],"zeilen":[["Punkt","Beschreibung"]]}
-    checkliste_json: JSON-Array z.B. ["Punkt 1","Punkt 2","Punkt 3"]
-    fazit: Abschlusstext (optional)
-    cta_text: Text im CTA-Block (optional)
-    status: "draft" (Entwurf) oder "publish" (sofort veröffentlichen)
+    abschnitte_json:  JSON-Array z.B. [{"titel":"Abschnitt 1","text":"..."}]
+    bild_suchbegriff: Suchbegriff / Prompt für das Bild (Englisch empfohlen)
+    bild_quelle:      "pexels" (Stockfoto), "dalle" (KI via ChatGPT/OpenAI), "higgsfield" (KI)
+    tipp_box:         Kurzer hervorgehobener Tipp (optional)
+    tabelle_json:     JSON z.B. {"kopfzeile":["Was","Wie"],"zeilen":[["...","..."]]}
+    checkliste_json:  JSON-Array z.B. ["Punkt 1","Punkt 2"]
+    fazit:            Abschlusstext (optional)
+    cta_text:         Text im CTA-Block (optional)
+    status:           "draft" (Entwurf) oder "publish" (sofort live)
     """
     try:
         abschnitte = json.loads(abschnitte_json) if abschnitte_json else []
@@ -244,13 +303,13 @@ def blogbeitrag_erstellen(
     except Exception:
         checkliste = None
 
-    # Pexels-Bild holen
+    # Bild holen (Pexels / DALL-E / Higgsfield)
     bild_url = ""
     media_id = 0
-    if pexels_suchbegriff:
-        bild_url = pexels_bild_url(pexels_suchbegriff)
+    if bild_suchbegriff:
+        bild_url = bild_holen(bild_suchbegriff, bild_quelle)
         if bild_url:
-            sicherer_name = pexels_suchbegriff.replace(" ", "-")[:40]
+            sicherer_name = bild_suchbegriff.replace(" ", "-")[:40]
             media_id = bild_nach_wordpress_hochladen(bild_url, sicherer_name)
 
     # Bild in erstes Abschnitt einfügen wenn vorhanden
@@ -356,6 +415,94 @@ def beitrag_aktualisieren(
         if r.status_code == 200:
             return f"Beitrag {post_id} aktualisiert. Status: {r.json().get('status')}"
         return f"Fehler {r.status_code}: {r.text[:200]}"
+    except Exception as e:
+        return f"Verbindungsfehler: {e}"
+
+
+@mcp.tool()
+def beitrag_inhalt_holen(post_id: int) -> str:
+    """
+    Liest Titel und Inhalt eines bestehenden Beitrags aus.
+    Nutze das um alte Beiträge umzuformatieren:
+    1. beitrag_inhalt_holen(id) aufrufen
+    2. Inhalt mit blogbeitrag_html_ersetzen() im neuen Block-Layout speichern
+    """
+    try:
+        r = requests.get(
+            f"{WP_URL}/wp-json/wp/v2/posts/{post_id}",
+            headers=wp_headers(),
+            timeout=15
+        )
+        if r.status_code == 200:
+            p = r.json()
+            titel    = p["title"]["rendered"]
+            inhalt   = p["content"]["rendered"]
+            status   = p["status"]
+            link     = p.get("link", "")
+            return f"TITEL: {titel}\nSTATUS: {status}\nURL: {link}\n\nINHALT (HTML):\n{inhalt}"
+        return f"Beitrag {post_id} nicht gefunden. Fehler {r.status_code}"
+    except Exception as e:
+        return f"Verbindungsfehler: {e}"
+
+
+@mcp.tool()
+def blogbeitrag_html_ersetzen(
+    post_id: int,
+    neuer_inhalt_html: str,
+    status: str = ""
+) -> str:
+    """
+    Ersetzt den HTML-Inhalt eines bestehenden Beitrags komplett.
+    Zum Umformatieren alter Beiträge ins neue Block-Layout.
+    status leer lassen = Status bleibt wie er ist.
+    """
+    daten: dict = {"content": neuer_inhalt_html}
+    if status:
+        daten["status"] = status
+    try:
+        r = requests.post(
+            f"{WP_URL}/wp-json/wp/v2/posts/{post_id}",
+            headers=wp_headers(),
+            json=daten,
+            timeout=30
+        )
+        if r.status_code == 200:
+            p = r.json()
+            return f"Beitrag {post_id} aktualisiert.\nStatus: {p['status']}\nURL: {p.get('link','–')}"
+        return f"Fehler {r.status_code}: {r.text[:300]}"
+    except Exception as e:
+        return f"Verbindungsfehler: {e}"
+
+
+@mcp.tool()
+def alle_beitraege_umformatieren_vorbereiten(anzahl: int = 50) -> str:
+    """
+    Listet alle Beiträge mit ID und Titel auf, damit du sie nacheinander
+    umformatieren kannst. Ruf dann für jeden: beitrag_inhalt_holen(id),
+    dann blogbeitrag_html_ersetzen(id, neues_html) auf.
+    """
+    try:
+        r = requests.get(
+            f"{WP_URL}/wp-json/wp/v2/posts",
+            headers=wp_headers(),
+            params={"per_page": anzahl, "status": "any"},
+            timeout=20
+        )
+        if r.status_code == 200:
+            beitraege = r.json()
+            if not beitraege:
+                return "Keine Beiträge vorhanden."
+            zeilen = [
+                f"ID {b['id']:5} | {b['status']:9} | {b['title']['rendered'][:55]}"
+                for b in beitraege
+            ]
+            total = len(zeilen)
+            return (
+                f"{total} Beiträge gefunden. Starte Umformatierung mit:\n"
+                "→ beitrag_inhalt_holen(ID) → Inhalt analysieren → blogbeitrag_html_ersetzen(ID, neues_html)\n\n"
+                + "\n".join(zeilen)
+            )
+        return f"Fehler {r.status_code}"
     except Exception as e:
         return f"Verbindungsfehler: {e}"
 

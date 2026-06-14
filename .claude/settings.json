@@ -7,7 +7,9 @@
         "WP_URL": "https://heidifrank.de",
         "WP_USER": "DEIN-BENUTZERNAME",
         "WP_PASSWORD": "xxxx xxxx xxxx xxxx xxxx xxxx",
-        "PEXELS_API_KEY": "DEIN-PEXELS-KEY"
+        "PEXELS_API_KEY": "DEIN-PEXELS-KEY",
+        "OPENAI_API_KEY": "DEIN-OPENAI-KEY",
+        "HIGGSFIELD_API_KEY": "DEIN-HIGGSFIELD-KEY"
       }
     }
   }
