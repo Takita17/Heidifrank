@@ -540,6 +540,74 @@ def alle_beitraege_umformatieren_vorbereiten(anzahl: int = 50) -> str:
 
 
 @mcp.tool()
+def seite_lesen(slug_oder_id: str) -> str:
+    """
+    Liest eine WordPress-Seite (Page) aus – z.B. die Partner-Seite.
+    slug_oder_id: Seiten-Slug (z.B. "partner") oder numerische ID.
+    Nutze das um Partner-Links, Seiteninhalt etc. zu lesen.
+    """
+    try:
+        # Erst per Slug versuchen
+        params = {"slug": slug_oder_id} if not slug_oder_id.isdigit() else {}
+        if slug_oder_id.isdigit():
+            url = f"{WP_URL}/wp-json/wp/v2/pages/{slug_oder_id}"
+            r = requests.get(url, headers=wp_headers(), timeout=15)
+        else:
+            r = requests.get(
+                f"{WP_URL}/wp-json/wp/v2/pages",
+                headers=wp_headers(),
+                params={"slug": slug_oder_id, "per_page": 1},
+                timeout=15
+            )
+            if r.status_code == 200 and r.json():
+                seite = r.json()[0]
+                return (
+                    f"TITEL: {seite['title']['rendered']}\n"
+                    f"SLUG: {seite['slug']}\n"
+                    f"URL: {seite.get('link','')}\n\n"
+                    f"INHALT:\n{seite['content']['rendered']}"
+                )
+            return f"Seite '{slug_oder_id}' nicht gefunden."
+
+        if r.status_code == 200:
+            seite = r.json()
+            if isinstance(seite, list):
+                seite = seite[0] if seite else None
+            if not seite:
+                return "Seite nicht gefunden."
+            return (
+                f"TITEL: {seite['title']['rendered']}\n"
+                f"SLUG: {seite['slug']}\n"
+                f"URL: {seite.get('link','')}\n\n"
+                f"INHALT:\n{seite['content']['rendered']}"
+            )
+        return f"Fehler {r.status_code}"
+    except Exception as e:
+        return f"Verbindungsfehler: {e}"
+
+
+@mcp.tool()
+def alle_seiten_auflisten() -> str:
+    """Listet alle WordPress-Seiten (Pages) mit ID, Slug und Titel auf."""
+    try:
+        r = requests.get(
+            f"{WP_URL}/wp-json/wp/v2/pages",
+            headers=wp_headers(),
+            params={"per_page": 100},
+            timeout=15
+        )
+        if r.status_code == 200:
+            seiten = r.json()
+            if not seiten:
+                return "Keine Seiten gefunden."
+            zeilen = [f"ID {s['id']:5} | /{s['slug']:<30} | {s['title']['rendered'][:50]}" for s in seiten]
+            return "WordPress-Seiten:\n" + "\n".join(zeilen)
+        return f"Fehler {r.status_code}"
+    except Exception as e:
+        return f"Verbindungsfehler: {e}"
+
+
+@mcp.tool()
 def verbindung_testen() -> str:
     """Testet ob WordPress und Zugangsdaten korrekt sind."""
     try:
