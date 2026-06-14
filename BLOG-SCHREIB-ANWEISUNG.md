@@ -110,43 +110,56 @@ Beispiel für Affiliate (ohne Produktname):
 
 ## Partner-Verlinkung (Direktvertrieb – Pflicht-Regel)
 
-Heidi Frank ist Partnerin bei mehreren Direktvertrieb-Firmen (Gigwand, WiTeReits, Maiimpuls u.a.).
+Heidi Frank ist Partnerin bei diesen Direktvertrieb-Firmen:
+
+| Interne Bezeichnung | Was sie anbieten | Blog-Themen die passen |
+|---|---|---|
+| **Partner A** (Qi-Quant) | Quantenfeld-Technologie: Wasservitalisierung, Raumklima, Arbeitsplatz-Energie | Wasserqualität, Raumenergie, Elektrosmog, Vitalität |
+| **Partner B** (Vitarights) | Frequenztechnologie, Vitalizer, Biophotonen, ViSponder | Frequenzmedizin, Zellerneuerung, Energie-Balance |
+| **Partner C** (MyImpulse) | Nahrungsergänzung, Frequenz-Tropfen, B6+B12 | Vitaminmangel, Burnout, Energie, Immunsystem |
+| **Partner D** (Wenura) | Neu – Details noch zu klären | – |
 
 ### Was ERLAUBT ist:
-- Themen und Inhalte die mit den Produkten/Leistungen zusammenhängen → frei schreiben
-- Links auf Heidis Partnerseiten innerhalb der Werbeanzeige oder als natürlicher Textlink
-- Indirekte Empfehlungen: "Ein Programm, das ich persönlich empfehle..." + Link
-- Bilder und Infos von den Partnerseiten als Inspiration für Inhalte
+- Themen und Inhalte die mit den Produkten zusammenhängen → frei und ausführlich schreiben
+- Links auf Heidis persönliche Partnerseiten (in der Werbeanzeige oder als Textlink)
+- Indirekte Empfehlung: "Ein Gerät, das ich meinen Klientinnen zeige..." + Link
+- Formulierungen wie "ein Frequenzgerät", "ein Nahrungsergänzungsprodukt", "eine Technologie..."
 
 ### Was VERBOTEN ist:
-- **Firmenname darf NIRGENDWO im Blogbeitrag stehen** (Gigwand, WiTeReits, Maiimpuls, etc.)
-- Kein Firmenname im Fließtext, in Überschriften, in der Werbeanzeige, in Alt-Texten
-- Kein Firmenname im CTA-Button
+- **Kein Firmenname irgendwo im Beitrag** (Qi-Quant, Vitarights, MyImpulse, Wenura)
+- Nicht in Überschriften, Fließtext, Werbeanzeige, Bildtexten, Alt-Tags, CTA
+- Nicht mal andeutungsweise: "Qi..." oder "Vita..." als Abkürzung
 
 ### Warum:
-Direktvertrieb-Recht verbietet es Partnern, Firmennamen in öffentlichen Werbematerialien
-zu nennen ohne explizite Genehmigung. Bei Verstoß droht Abmahnung.
+Direktvertrieb-Gesetz: Ohne ausdrückliche Genehmigung des Unternehmens darf der Name
+nicht in öffentlicher Werbung erscheinen. Verstoß = Abmahnung möglich.
 
 ### Richtig formuliert:
-❌ "Das Programm von Gigwand hilft dir..."
-✅ "Das Gesundheitsprogramm, das ich meinen Klientinnen empfehle, hilft dir..."
+❌ "Das Qi-Quant Gerät hilft dir..."
+✅ "Das Quantenfeld-Gerät, das ich selbst nutze, hat mein Raumklima verändert..." + Link
 
-❌ "Mehr Infos auf gigwand.de"
-✅ Link auf Heidis persönliche Partnerseite (nicht direkt auf die Firmenseite)
+❌ "Mehr auf vitarights.de"
+✅ Link auf Heidis eigene Partnerseite bei Vitarights
 
 ---
 
 ## Themen-Ideen für heidifrank.de
 
-| Thema | Suchvolumen-Potenzial |
-|---|---|
-| Stressabbau Techniken | hoch |
-| Vagusnerv aktivieren | mittel-hoch |
-| Schlafprobleme Frauen ab 40 | hoch |
-| Burnout erkennen | sehr hoch |
-| Cortisol senken natürlich | hoch |
-| Energie-Balance im Alltag | mittel |
-| Nervensystem beruhigen | mittel-hoch |
-| Atemübungen Stressabbau | hoch |
-| Transformation innere Blockaden | mittel |
-| Wissenschaft der Entspannung | mittel |
+Themen die zu Heidis Arbeit passen UND natürlich zu einem oder mehreren Partnern führen:
+
+| Thema | Suchvolumen | Passender Partner |
+|---|---|---|
+| Leitungswasser vs. vitales Wasser – was ist wirklich gesund? | hoch | Partner A (Wasservitalisierung) |
+| Elektrosmog im Alltag – wie schützt du dein Nervensystem? | mittel-hoch | Partner A (Raumklima) |
+| Frequenzmedizin: Was steckt wirklich dahinter? | mittel | Partner B |
+| Biophotonen und Zellenergie – die Wissenschaft dahinter | mittel | Partner B |
+| Vitaminmangel erkennen: Warum B6 und B12 so wichtig sind | sehr hoch | Partner C |
+| Burnout oder Vitaminmangel? Wie du den Unterschied erkennst | hoch | Partner C |
+| Stressabbau Techniken – was Wissenschaft und Erfahrung zeigen | hoch | Heidis Programm |
+| Vagusnerv aktivieren: 5 Wege in 5 Minuten | mittel-hoch | Heidis Programm |
+| Schlafprobleme Frauen ab 40 – die wahren Ursachen | hoch | Alle Partner |
+| Cortisol senken natürlich – ohne Medikamente | hoch | Alle Partner |
+| Energie-Balance im Alltag | mittel | Heidis Programm + Partner C |
+| Nervensystem beruhigen – mein persönlicher Weg | mittel-hoch | Heidis Programm |
+| Transformation: Warum innere Blockaden körperlich sind | mittel | Heidis Programm |
+| Raumklima und Gesundheit – unterschätzt und unterschätzt | mittel | Partner A |
