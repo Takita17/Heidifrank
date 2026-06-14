@@ -1,0 +1,14 @@
+{
+  "mcpServers": {
+    "heidifrank-wordpress": {
+      "command": "python",
+      "args": ["wordpress-mcp-server.py"],
+      "env": {
+        "WP_URL": "https://heidifrank.de",
+        "WP_USER": "DEIN-BENUTZERNAME",
+        "WP_PASSWORD": "xxxx xxxx xxxx xxxx xxxx xxxx",
+        "PEXELS_API_KEY": "DEIN-PEXELS-KEY"
+      }
+    }
+  }
+}
