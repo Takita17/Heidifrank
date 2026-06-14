@@ -1,0 +1,7 @@
+# Zugangsdaten – niemals ins Repo pushen
+.claude/settings.json
+
+# Generierte Dateien
+__pycache__/
+*.pyc
+*.pyo
