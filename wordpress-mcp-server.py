@@ -132,13 +132,15 @@ def erstelle_blog_html(
     tabelle: dict = None,
     checkliste: list = None,
     fazit: str = "",
-    cta_text: str = ""
+    cta_text: str = "",
+    werbeanzeige: dict = None
 ) -> str:
     """
     Baut professionelles Block-HTML für den Beitrag.
-    abschnitte = [{"titel": str, "text": str, "bild_url": str (optional)}]
-    tabelle = {"kopfzeile": [...], "zeilen": [[...]]}
-    checkliste = ["Punkt 1", "Punkt 2", ...]
+    abschnitte   = [{"titel": str, "text": str, "bild_url": str (optional)}]
+    tabelle      = {"kopfzeile": [...], "zeilen": [[...]]}
+    checkliste   = ["Punkt 1", "Punkt 2", ...]
+    werbeanzeige = {"text": str, "link": str, "link_text": str, "bild_url": str (optional)}
     """
 
     ORANGE  = "#D94A15"
@@ -156,7 +158,7 @@ def erstelle_blog_html(
 </div>
 """
 
-    # Abschnitte
+    # Abschnitte – nach dem 2. Abschnitt kommt ggf. die Werbeanzeige
     for i, a in enumerate(abschnitte):
         bild = a.get("bild_url", "")
         bild_html = f'<img src="{bild}" alt="{a["titel"]}" style="width:100%;height:auto;border-radius:10px;margin-bottom:20px;display:block;">' if bild else ""
@@ -177,6 +179,27 @@ def erstelle_blog_html(
   {bild_html}
   <h2 style="color:{ORANGE};font-size:1.45em;margin-top:0;margin-bottom:14px;">{a['titel']}</h2>
   <p style="margin:0;font-size:1.02em;">{a['text']}</p>
+</div>
+"""
+
+        # Werbeanzeige nach dem 2. Abschnitt einfügen
+        if i == 1 and werbeanzeige:
+            w_bild  = werbeanzeige.get("bild_url", "")
+            w_text  = werbeanzeige.get("text", "")
+            w_link  = werbeanzeige.get("link", "#")
+            w_btn   = werbeanzeige.get("link_text", "Jetzt ansehen")
+            w_bild_html = f'<img src="{w_bild}" alt="Anzeige" style="width:110px;border-radius:8px;flex-shrink:0;">' if w_bild else ""
+            html += f"""
+<!-- WERBEANZEIGE -->
+<div style="border:2px solid {GOLD};border-radius:12px;padding:24px 28px;margin-bottom:28px;background:#FFFDF5;position:relative;">
+  <div style="position:absolute;top:-13px;left:20px;background:{GOLD};color:#fff;padding:3px 14px;border-radius:20px;font-size:0.78em;font-weight:700;letter-spacing:1px;">ANZEIGE</div>
+  <div style="display:flex;gap:20px;align-items:center;flex-wrap:wrap;">
+    {w_bild_html}
+    <div style="flex:1;min-width:200px;">
+      <p style="color:{TEXT};margin:0 0 10px;font-size:1em;line-height:1.6;">{w_text}</p>
+      <a href="{w_link}" style="background:{ORANGE};color:#fff;padding:9px 22px;border-radius:25px;text-decoration:none;font-weight:700;font-size:0.92em;display:inline-block;">{w_btn} →</a>
+    </div>
+  </div>
 </div>
 """
 
@@ -271,6 +294,7 @@ def blogbeitrag_erstellen(
     tipp_box: str = "",
     tabelle_json: str = "",
     checkliste_json: str = "",
+    werbeanzeige_json: str = "",
     fazit: str = "",
     cta_text: str = "",
     status: str = "draft"
@@ -278,15 +302,17 @@ def blogbeitrag_erstellen(
     """
     Erstellt einen professionellen Blogbeitrag für heidifrank.de.
 
-    abschnitte_json:  JSON-Array z.B. [{"titel":"Abschnitt 1","text":"..."}]
-    bild_suchbegriff: Suchbegriff / Prompt für das Bild (Englisch empfohlen)
-    bild_quelle:      "pexels" (Stockfoto), "dalle" (KI via ChatGPT/OpenAI), "higgsfield" (KI)
-    tipp_box:         Kurzer hervorgehobener Tipp (optional)
-    tabelle_json:     JSON z.B. {"kopfzeile":["Was","Wie"],"zeilen":[["...","..."]]}
-    checkliste_json:  JSON-Array z.B. ["Punkt 1","Punkt 2"]
-    fazit:            Abschlusstext (optional)
-    cta_text:         Text im CTA-Block (optional)
-    status:           "draft" (Entwurf) oder "publish" (sofort live)
+    abschnitte_json:    JSON-Array z.B. [{"titel":"Abschnitt 1","text":"langer Text..."}]
+                        WICHTIG: Gesamt-Wortanzahl aller Texte zusammen = 1800-2000 Wörter.
+    bild_suchbegriff:  Suchbegriff / Prompt für das Bild (Englisch empfohlen)
+    bild_quelle:       "pexels" (Stockfoto), "dalle" (KI via ChatGPT/OpenAI), "higgsfield" (KI)
+    tipp_box:          Kurzer hervorgehobener Tipp (optional)
+    tabelle_json:      JSON z.B. {"kopfzeile":["Was","Wie"],"zeilen":[["...","..."]]}
+    checkliste_json:   JSON-Array z.B. ["Punkt 1","Punkt 2"]
+    werbeanzeige_json: JSON z.B. {"text":"Empfehlung...","link":"https://...","link_text":"Mehr erfahren","bild_url":"https://..."}
+    fazit:             Abschlusstext (optional)
+    cta_text:          Text im CTA-Block am Ende (optional)
+    status:            "draft" (Entwurf) oder "publish" (sofort live)
     """
     try:
         abschnitte = json.loads(abschnitte_json) if abschnitte_json else []
@@ -302,6 +328,11 @@ def blogbeitrag_erstellen(
         checkliste = json.loads(checkliste_json) if checkliste_json else None
     except Exception:
         checkliste = None
+
+    try:
+        werbeanzeige = json.loads(werbeanzeige_json) if werbeanzeige_json else None
+    except Exception:
+        werbeanzeige = None
 
     # Bild holen (Pexels / DALL-E / Higgsfield)
     bild_url = ""
@@ -324,7 +355,8 @@ def blogbeitrag_erstellen(
         tabelle=tabelle,
         checkliste=checkliste,
         fazit=fazit,
-        cta_text=cta_text
+        cta_text=cta_text,
+        werbeanzeige=werbeanzeige
     )
 
     # An WordPress senden
